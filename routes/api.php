@@ -38,3 +38,5 @@ Route::get('movies/fill_data', '\App\Http\Controllers\Api\MovieController@fillDa
 Route::get('movies', '\App\Http\Controllers\Api\MovieController@getAll');
 Route::get('movies/posters/{id}', '\App\Http\Controllers\Api\MovieController@getPosters');
 Route::get('movies/thrillers/{id}', '\App\Http\Controllers\Api\MovieController@getThrillers');
+
+Route::get('images', '\App\Http\Controllers\Api\ImageController@getAll');

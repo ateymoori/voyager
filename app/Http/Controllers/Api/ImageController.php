@@ -4,16 +4,37 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Movie;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 
-class MovieController extends Controller
+class ImageController extends Controller
 {
     public function getAll()
     {
-        $all = Movie::orderBy('id', 'desc')->get() ;
-        return response()->json($all) ;
+        $client = new \GuzzleHttp\Client();
+        $client = new \GuzzleHttp\Client();
+        $request = $client->get("https://pixabay.com/api/?key=14649220-5ae78e4612f86b869152790a4&image_type=photo&per_page=200&orientation=vertical&q=horror");
+        $response = json_decode($request->getBody(), true);
+        $images = $response['hits'];
+       
+        foreach ($images as $image) {
+            unset($image['pageURL']);
+            unset($image['type']);
+            unset($image['previewWidth']);
+            unset($image['previewHeight']);
+            unset($image['previewHeight']);
+            unset($image['webformatWidth']);
+            unset($image['webformatHeight']);
+            unset($image['imageHeight']);
+            unset($image['webformatURL']);
+            unset($image['downloads']);
+            unset($image['comments']);
+            unset($image['imageWidth']);
+            unset($image['user_id']);
+            $outPut[] = $image ;
+        }
+        
+        return response()->json($outPut) ;
     }
 
     public function fillData()
@@ -33,9 +54,8 @@ class MovieController extends Controller
             try {
                 $year = $response_b['Year'];
                 $rotten_tomato = $response_b['Ratings'][1]['Value'];
-
             } catch (\Throwable $th) {
-                dd( $movieName);
+                dd($movieName);
             }
             $runtime = $response_b['Runtime'];
             $genres = $response_b['Genre'];
@@ -78,7 +98,7 @@ class MovieController extends Controller
         $response = json_decode($request->getBody(), true);
         $posters = $response['posters'] ;
         $backdrops = $response['backdrops'] ;
-        $merged = array_merge($backdrops ,$posters );
+        $merged = array_merge($backdrops, $posters);
        
         foreach ($merged as $image) {
             $image['file_path'] = 'https://image.tmdb.org/t/p/original'.$image['file_path'];

@@ -7,7 +7,7 @@
 // Client secret: 36k8Qf4Zr2JxpzfilBO3JG4kCQYMyo6MKSt5jowF
 //composer require guzzlehttp/guzzle
 
-
+// 203fcc7ea7cb5c95e6f74ae7c0d2ed74539f1371
 namespace App\Http\Controllers\Voyager;
 
 use App\Http\Controllers\Controller;
@@ -19,18 +19,24 @@ class StoryController extends Controller
 {
     public function getAll()
     {
-        $all = Story::get() ;
+        $all = Story::orderBy('id', 'desc')->get() ;
         foreach ($all as $story) {
             $story['author']=Author::findOrFail($story['author']);
             unset($story['updated_at']);
             unset($story['created_at']);
             unset($story['content']);
-            unset($story['mp3_file']);
+            //unset($story['mp3_file']);
             unset($story['author']['updated_at']);
             unset($story['author']['created_at']);
             unset($story['author']['description']);
             $story['image'] = url('/')."/storage/".$story['image'];
             $story['author']['image'] = url('/')."/storage/".$story['author']['image'];
+            if (strlen($story['mp3_file'])>5) {
+                $mp3= json_decode($story['mp3_file'], true)  ;
+                $story['mp3_file'] =  url('/')."/storage/".$mp3[0]['download_link'];
+            }else{
+                $story['mp3_file'] = null;
+            }
         }
         return response()->json($all) ;
     }
@@ -45,6 +51,8 @@ class StoryController extends Controller
         if (strlen($story['mp3_file'])>5) {
             $mp3= json_decode($story['mp3_file'], true)  ;
             $story['mp3_file'] =  url('/')."/storage/".$mp3[0]['download_link'];
+        }else{
+            $story['mp3_file'] = null;
         }
         return response()->json($story) ;
     }
